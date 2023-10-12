@@ -5,6 +5,7 @@ import MLogoTemp from "../../public/MLogoTemp.png";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 import { ListView } from "~/components/ListView";
+import type { List } from "@prisma/client";
 
 const Home: NextPage = () => {
   const { user } = useUser();
@@ -84,7 +85,7 @@ const Feed = (props: { userId: string }) => {
 
   return (
     <div className="flex w-full flex-col">
-      {data.map((list) => (
+      {data.map((list: List) => (
         <ListView {...list} key={list.id} />
       ))}
     </div>
