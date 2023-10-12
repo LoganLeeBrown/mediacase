@@ -4,6 +4,7 @@ import Image from "next/image";
 import MLogoTemp from "../../public/MLogoTemp.png";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
+import { ListView } from "~/components/ListView";
 
 const Home: NextPage = () => {
   const { user } = useUser();
@@ -84,14 +85,7 @@ const Feed = (props: { userId: string }) => {
   return (
     <div className="flex w-full flex-col">
       {data.map((list) => (
-        <div {...list} key={list.id}>
-          <div className="m-2 flex w-full flex-col justify-start rounded-lg border-8 border-white">
-            <header className="bg-white  pl-2 pt-2 font-serif">
-              {list.name}
-            </header>
-            <div className="p-8"></div>
-          </div>
-        </div>
+        <ListView {...list} key={list.id} />
       ))}
     </div>
   );
