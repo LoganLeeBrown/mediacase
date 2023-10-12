@@ -47,5 +47,8 @@
   "ct3aMetadata": {
     "initVersion": "7.20.2"
   },
-  "packageManager": "npm@9.5.1"
+  "packageManager": "npm@9.5.1",
+  "prisma": {
+    "schema": "./node_modules/@bojackstudios/bojackrepo/schema.prisma"
+  }
 }
