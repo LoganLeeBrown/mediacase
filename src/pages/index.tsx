@@ -1,5 +1,3 @@
-import Head from "next/head";
-import Link from "next/link";
 import { type NextPage } from "next";
 import { api } from "~/utils/api";
 import Image from "next/image";
@@ -8,11 +6,19 @@ import { useUser } from "@clerk/nextjs";
 import { toast } from "react-hot-toast";
 
 const Home: NextPage = () => {
-  const { isSignedIn, user } = useUser();
+  const { user } = useUser();
 
   if (!user) return <div />;
 
   const id = user.id;
+
+  const { data, isLoading: countLoading } = api.user.getUserCountById.useQuery({
+    id,
+  });
+
+  if (countLoading) {
+    return <h1>Loading...................</h1>;
+  }
 
   return (
     <>
@@ -25,7 +31,8 @@ const Home: NextPage = () => {
           />
         </div>
         <div className="mx-10 flex justify-start">
-          <Feed />
+          {data == 0 && <SyncUserWizard userId={id} />}
+          {data != 0 && <Feed userId={id} />}
         </div>
         <div></div>
       </main>
@@ -33,18 +40,8 @@ const Home: NextPage = () => {
   );
 };
 
-const Feed = () => {
-  const { isSignedIn, user } = useUser();
-
-  if (!user) return <div />;
-
-  const id = user.id;
-
-  const { data, isLoading: countLoading } = api.user.getUserCountById.useQuery({
-    id,
-  });
-
-  const { mutate, isLoading: isPosting } = api.user.createUser.useMutation({
+const SyncUserWizard = (props: { userId: string }) => {
+  const { mutate } = api.user.createUser.useMutation({
     onSuccess: () => {
       window.location.reload();
     },
@@ -58,19 +55,44 @@ const Feed = () => {
     },
   });
 
-  if (countLoading) {
-    return <h1>Loading...................</h1>;
-  }
   return (
     <div className="flex flex-col">
-      {data == 0 && (
-        <button
-          className="w-28 rounded-sm bg-white shadow-lg"
-          onClick={() => mutate({ content: id })}
-        >
-          SyncUser
-        </button>
-      )}
+      <button
+        className="w-28 rounded-sm bg-white shadow-lg"
+        onClick={() => mutate({ content: props.userId })}
+      >
+        SyncUser
+      </button>
+    </div>
+  );
+};
+
+const Feed = (props: { userId: string }) => {
+  const { data, isLoading: listsLoading } = api.list.getByOwnerId.useQuery({
+    id: props.userId,
+  });
+
+  if (listsLoading)
+    return (
+      <div className="flex flex-col">
+        <div>Loading</div>
+      </div>
+    );
+
+  if (!data) return <div>oop, no lists</div>;
+
+  return (
+    <div className="flex w-full flex-col">
+      {data.map((list) => (
+        <div {...list} key={list.id}>
+          <div className="m-2 flex w-full flex-col justify-start rounded-lg border-8 border-white">
+            <header className="bg-white  pl-2 pt-2 font-serif">
+              {list.name}
+            </header>
+            <div className="p-8"></div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

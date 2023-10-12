@@ -4,7 +4,6 @@ import {
   privateProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import type { User } from "@prisma/client";
 
 export const userRouter = createTRPCRouter({
   getUserCountById: publicProcedure
@@ -21,7 +20,7 @@ export const userRouter = createTRPCRouter({
         content: z.string(),
       }),
     )
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx }) => {
       const authorId = ctx.userId;
 
       const user = await ctx.prisma.user.create({
